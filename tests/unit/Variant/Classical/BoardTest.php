@@ -567,13 +567,20 @@ class BoardTest extends AbstractUnitTestCase
         (new Board())->play('w', 'Nw3');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | play()
+    |--------------------------------------------------------------------------
+    |
+    | Illegal moves return false.
+    |
+    */
+
     /**
      * @test
      */
     public function init_board_and_pick_a_nonexistent_piece()
     {
-        $this->expectException(\Chess\Exception\BoardException::class);
-
         $pieces = [
             new P('w', 'a2', self::$size),
             new P('w', 'a3', self::$size),
@@ -591,17 +598,10 @@ class BoardTest extends AbstractUnitTestCase
 
         $castlingAbility = '-';
 
-        (new Board($pieces, $castlingAbility))->play('w', 'f4');
-    }
+        $board = new Board($pieces, $castlingAbility);
 
-    /*
-    |--------------------------------------------------------------------------
-    | play()
-    |--------------------------------------------------------------------------
-    |
-    | Illegal moves return false.
-    |
-    */
+        $this->assertFalse($board->play('w', 'f4'));
+    }
 
     /**
      * @test

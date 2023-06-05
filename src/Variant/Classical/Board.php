@@ -448,22 +448,16 @@ class Board extends \SplObjectStorage
      *
      * @param object $move
      * @return array
-     * @throws \Chess\Exception\BoardException
      */
     private function pickPiece(object $move): array
     {
         $found = [];
         foreach ($this->getPieces($move->color) as $piece) {
             if ($piece->getId() === $move->id) {
-                if ($piece->getId() === Piece::K) {
-                    return [$piece->setMove($move)];
-                } elseif (preg_match("/{$move->sq->current}/", $piece->getSq())) {
+                if (strstr($piece->getSq(), $move->sq->current)) {
                     $found[] = $piece->setMove($move);
                 }
             }
-        }
-        if (!$found) {
-            throw new BoardException();
         }
 
         return $found;
@@ -624,7 +618,8 @@ class Board extends \SplObjectStorage
                     return $this->move($piece);
                 }
             }
-        } elseif ($piece = $pieces[0]) {
+        } elseif (count($pieces) === 1) {
+            $piece = current($pieces);
             if ($piece->isMovable() && !$this->leavesInCheck($piece)) {
                 if ($piece->getMove()->type === $this->move->case(MOVE::CASTLE_SHORT)) {
                     return $this->castle($piece, RType::CASTLE_SHORT);
