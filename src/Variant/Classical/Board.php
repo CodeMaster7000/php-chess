@@ -611,26 +611,19 @@ class Board extends \SplObjectStorage
      */
     protected function isLegalMove(object $move): bool
     {
-        $pieces = $this->pickPiece($move);
-        $count = count($pieces);
-        if ($count > 1) {
+        if ($pieces = $this->pickPiece($move)) {
             foreach ($pieces as $piece) {
                 if ($piece->isMovable() && !$this->leavesInCheck($piece)) {
-                    return $this->move($piece);
+                    if ($piece->getMove()->type === $this->move->case(MOVE::CASTLE_SHORT)) {
+                        return $this->castle($piece, RType::CASTLE_SHORT);
+                    } elseif ($piece->getMove()->type === $this->move->case(MOVE::CASTLE_LONG)) {
+                        return $this->castle($piece, RType::CASTLE_LONG);
+                    } else {
+                        return $this->move($piece);
+                    }
                 }
             }
-        } elseif ($count === 1) {
-            $piece = $pieces[0];
-            if ($piece->isMovable() && !$this->leavesInCheck($piece)) {
-                if ($piece->getMove()->type === $this->move->case(MOVE::CASTLE_SHORT)) {
-                    return $this->castle($piece, RType::CASTLE_SHORT);
-                } elseif ($piece->getMove()->type === $this->move->case(MOVE::CASTLE_LONG)) {
-                    return $this->castle($piece, RType::CASTLE_LONG);
-                } else {
-                    return $this->move($piece);
-                }
-            }
-         }
+        }
 
         return false;
     }
